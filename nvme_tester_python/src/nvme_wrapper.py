@@ -4,7 +4,7 @@ import json
 from logger.test_logger import TestLogger
 
 DEVICE = "/dev/nvme0"
-NVME = "nvme_2.8"
+NVME = "nvme"
 
 
 class NvmeCommands():

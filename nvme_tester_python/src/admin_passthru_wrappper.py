@@ -5,7 +5,7 @@ import subprocess
 
 CONST_TIMEOUT_LIMIT = 120  # 2 mins
 SECONDS_TO_MILISECONS = 1000  # second to miliseconds
-CONST_NVME = "nvme_2.8"
+CONST_NVME = "nvme"
 ADMIN_CMD = 'admin-passthru'
 
 # NVMe Command
