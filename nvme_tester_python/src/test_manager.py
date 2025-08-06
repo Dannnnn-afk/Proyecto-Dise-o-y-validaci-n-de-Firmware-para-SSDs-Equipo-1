@@ -1,5 +1,5 @@
-from logger.test_logger import TestLogger
-from nvme_commands.nvme_wrappper import NvmeCommands
+from test_cases import TestLogger
+from nvme_wrapper import NvmeCommands
 
 # Import test classes
 from unit_tests.test_read_write import TestReadWrite
@@ -32,7 +32,13 @@ class TestManager(object):
         self.test = tests_pool[self.testname](self.logger, self.nvme)
 
     def initialize(self):
-        # Construir e inicializar wappers, etc..
+        # Initialize the NVMe wrapper
+    
+        self.nvme = NvmeCommands(self.logger)
+        # Get the physical path of the NVMe device
+        self.physical_path = self.nvme.get_device_path(self.serial_number, self.nvme.list(json_output=True))
+     
+     
         pass
 
     def run(self):
@@ -48,6 +54,7 @@ class TestManager(object):
         pass
 
     def get_device_path(self, serial_number, nvme_list):
+        
         pass
 
 
