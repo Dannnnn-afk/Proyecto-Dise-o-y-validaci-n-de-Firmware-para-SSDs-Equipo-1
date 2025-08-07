@@ -2,10 +2,8 @@
 
 ## Deploy Key Information
 - **Name**: Team Deploy Key - NVMe Tester
-- **SHA256 Fingerprint**: `[WILL_BE_GENERATED_WHEN_YOU_CREATE_THE_KEY]`
-- **Public Key**: `[WILL_BE_GENERATED_WHEN_YOU_CREATE_THE_KEY]`
-
-> **Note**: The actual fingerprint and public key will be generated when you run the setup script.
+- **SHA256 Fingerprint**: `PqbqxUCl0Ut3vMQqerd7zk5ftL0NZT+i7S5bL55CcMg`
+- **Public Key**: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICviRF3r+lzQAhvClbyWWXCNVmuACUDvSgNIE+ke5G4F team-deploy-key@proyecto-nvme`
 
 ## Setup Instructions
 
@@ -95,7 +93,7 @@ ssh -vT team-deploy
 # Check key fingerprint
 ssh-keygen -lf ~/.ssh/team_deploy_key
 
-# Verify the fingerprint matches: [YOUR_GENERATED_FINGERPRINT]
+# Verify the fingerprint matches: SHA256:i6Z1b0k1NSiJZch1uTQq5NN4buLLgrBzAWu3M2BgOaY
 ```
 
 ### Common issues:

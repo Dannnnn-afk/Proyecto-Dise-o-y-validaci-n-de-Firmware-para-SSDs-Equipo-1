@@ -86,22 +86,6 @@ Host bitbucket.org
 #     IdentityFile ~/.ssh/id_ed25519
 #     ProxyJump bastion.example.com
 
-# Team Deploy Key configuration
-# SHA256:[YOUR_GENERATED_FINGERPRINT]
-Host team-deploy
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/team_deploy_key
-    PreferredAuthentications publickey
-    StrictHostKeyChecking yes
-
-# Alternative configuration for team deploy key with custom hostname
-Host team-github
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/team_deploy_key
-    PreferredAuthentications publickey
-
 # Codespace-specific configuration
 Host codespace
     HostName localhost
