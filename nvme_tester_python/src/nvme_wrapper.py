@@ -1,7 +1,7 @@
 import subprocess
 import json
 
-from logger.test_logger import TestLogger
+from ..tests.test_logger import TestLogger
 
 DEVICE = "/dev/nvme0"
 NVME = "nvme"

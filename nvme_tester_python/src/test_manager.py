@@ -1,13 +1,11 @@
-from test_cases import TestLogger
+from ..tests.test_logger import TestLogger
 from nvme_wrapper import NvmeCommands
 
-# Import test classes
-from unit_tests.test_read_write import TestReadWrite
-from unit_tests.dummy_test import DummyTest
+
 
 # Define set of available tests
-tests_pool = {"test_dummy": DummyTest,
-              "test_read_write": TestReadWrite
+tests_pool = {
+             
               }
 
 
