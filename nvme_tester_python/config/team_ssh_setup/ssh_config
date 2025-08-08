@@ -1,0 +1,13 @@
+# Team Deploy Key configuration for NVMe Tester Project
+Host team-deploy
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/team_deploy_key
+    PreferredAuthentications publickey
+
+# GitHub configuration using team key
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/team_deploy_key
+    PreferredAuthentications publickey
