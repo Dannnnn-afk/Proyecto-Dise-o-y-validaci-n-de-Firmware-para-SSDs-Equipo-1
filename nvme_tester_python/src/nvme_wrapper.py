@@ -44,6 +44,111 @@ class NvmeCommands():
 
         return output
 
+    # --- Comandos de logs y diagnóstico ---
+    def fw_log(self):
+        pass
+    def effects_log(self):
+        pass
+    def endurance_log(self):
+        pass
+    def predictable_lat_log(self):
+        pass
+    def telemetry_log(self):
+        pass
+    def changed_ns_list_log(self):
+        pass
+    def persistent_event_log(self):
+        pass
+    def sanitize_log(self):
+        pass
+    def get_log(self):
+        pass
+
+    # --- Comandos de I/O y testing ---
+    def read(self):
+        pass
+    def write(self):
+        pass
+    def write_zeros(self):
+        pass
+    def write_uncor(self):
+        pass
+    def compare(self):
+        pass
+    def verify(self):
+        pass
+    def flush(self):
+        pass
+    def dsm(self):
+        pass
+    def copy(self):
+        pass
+
+    # --- Comandos de configuración ---
+    def set_feature(self):
+        pass
+    def get_property(self):
+        pass
+    def set_property(self):
+        pass
+    def ns_attach(self):
+        pass
+    def ns_detach(self):
+        pass
+    def create_ns(self):
+        pass
+    def delete_ns(self):
+        pass
+    def ns_rescan(self):
+        pass
+
+    # --- Comandos de seguridad ---
+    def security_send(self):
+        pass
+    def security_recv(self):
+        pass
+    def sanitize(self):
+        pass
+    def crypto_scramble(self):
+        pass
+
+    # --- Comandos administrativos ---
+    def reset(self):
+        pass
+    def subsystem_reset(self):
+        pass
+    def rescan(self):
+        pass
+    def show_regs(self):
+        pass
+    def discover(self):
+        pass
+    def connect(self):
+        pass
+    def disconnect(self):
+        pass
+    def dim(self):
+        pass
+
+    # --- Comandos de firmware ---
+    def fw_download(self):
+        pass
+    def fw_commit(self):
+        pass
+    def fw_download_status(self):
+        pass
+
+    # --- Comandos de utilidad ---
+    def help(self):
+        pass
+    def version(self):
+        pass
+    def show_topology(self):
+        pass
+    def monitor(self):
+        pass
+    
+
 
 test_logger = TestLogger("Prueba1")
 logger = test_logger.initialize_logger()
