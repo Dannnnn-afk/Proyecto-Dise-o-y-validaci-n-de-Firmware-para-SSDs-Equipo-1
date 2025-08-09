@@ -1,6 +1,7 @@
 import subprocess
 import json
 
+from ..utils.get_features_wrapper import GetFeatures
 from ..tests.test_logger import TestLogger
 
 DEVICE = "/dev/nvme0"
@@ -25,17 +26,33 @@ class NvmeCommands():
             self.logger.error(f"STDout: {e.stdout}")
             self.logger.error(f"STDError: {e.stderr}")
             return None
+    
+    def parametrizeOpcionsLogs(self, verbose=False, json_output=False, binary_raw=False):
+        options = []
+        if verbose:
+            options.append("-v")
+        if json_output:
+            options.append("--output-format=json")
+        if binary_raw:
+            options.append("-b")
+        return options
+    
+    
+    def parametrizeOpcionsConfig(self,nsze=False, ncap=False, flbas=False, dps=False,nmic=False,anagrp=False,):
+        options = []
+
+        return options
         
-    def list(self, verbose=False, json_output=False):
+    
+    def command_list(self,verbose=False, json_output=False, binary_raw=False):
         cmd = [
             self.nvme_cli,
-            "list"
+            "list",
+            self.device
         ]
-
-        if verbose:
-            cmd.append("-v")
-        if json_output:
-            cmd.append("--output-format=json")
+        options = self.parametrizeOpcionsLogs(verbose, json_output, binary_raw)
+        cmd.extend(options)
+        
 
         output = self.run_command(cmd)
 
@@ -45,6 +62,39 @@ class NvmeCommands():
         return output
 
     # --- Comandos de logs y diagnóstico ---
+    def smart_log(self, verbose=False, json_output=False, binary_raw=False):
+        cmd = [
+            self.nvme_cli,
+            "smart_log",
+            self.device
+        ]
+        options = self.parametrizeOpcionsLogs(verbose, json_output, binary_raw)
+        cmd.extend(options)
+        #Logger 
+
+        output = self.run_command(cmd)
+        
+        if json_output:
+            output = json.loads(output)
+        return output
+
+
+    def idctrol(self, verbose=False, json_output=False, binary_raw=False):
+        cmd = [
+            self.nvme_cli,
+            "id-ctrl",
+            self.device
+        ]
+        options = self.parametrizeOpcionsLogs(verbose, json_output, binary_raw)
+        cmd.extend(options)
+        
+        output = self.run_command(cmd)
+        
+        if json_output:
+            output = json.loads(output)
+        return output
+        
+
     def fw_log(self):
         pass
     def effects_log(self):
@@ -95,8 +145,14 @@ class NvmeCommands():
         pass
     def ns_detach(self):
         pass
-    def create_ns(self):
-        pass
+    def create_ns(self,):
+        cmd = [
+            self.nvme_cli,
+            "create-ns",
+            self.device]
+       
+        
+
     def delete_ns(self):
         pass
     def ns_rescan(self):

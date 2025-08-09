@@ -1,10 +1,16 @@
 from ..tests.test_logger import TestLogger
 from nvme_wrapper import NvmeCommands
 
+from ..tests.test_id_control import TestCases as TestIdControl
+from ..tests.test_logger import TestCases as TestIdControl
+from ..tests.test_smart_log import TestCases as TestIdControl
+from ..tests.test_smart_log_healt import TestCases as TestIdControl
 
 
 # Define set of available tests
 tests_pool = {
+    
+    
              
               }
 
