@@ -28,7 +28,7 @@ class NvmeCommands():
             self.logger.error(f"STDout: {e.stdout}")
             self.logger.error(f"STDError: {e.stderr}")
             return None
-    
+
     def parametrizeOpcionsLogs(self, verbose=False, json_output=False, binary_raw=False):
         options = []
         if verbose:
@@ -141,51 +141,49 @@ class NvmeCommands():
 
         return options
    # --- Comandos de logs y diagnóstico ---
-    def command_list(self,verbose=False, json_output=False, binary_raw=False):
+    def command_list(self, **kwargs):
         cmd = [
             self.nvme_cli,
             "list",
             self.device
         ]
-        options = self.parametrizeOpcionsLogs(verbose, json_output, binary_raw)
+        options = self.parametrizeOpcionsLogs(**kwargs)
         cmd.extend(options)
         
-
         output = self.run_command(cmd)
-
-        if json_output:
+        if kwargs.get('json_output', False) and output:
             output = json.loads(output)
-
         return output
-    def smart_log(self, verbose=False, json_output=False, binary_raw=False):
+    
+    def smart_log(self, **kwargs):
         cmd = [
             self.nvme_cli,
             "smart_log",
             self.device
         ]
-        options = self.parametrizeOpcionsLogs(verbose, json_output, binary_raw)
+        options = self.parametrizeOpcionsLogs(**kwargs)
         cmd.extend(options)
         #Logger 
-
+        
         output = self.run_command(cmd)
         
-        if json_output:
+        if kwargs.get('json_output', False) and output:
             output = json.loads(output)
         return output
 
 
-    def idctrol(self, verbose=False, json_output=False, binary_raw=False):
+    def idctrol(self, **kwargs):
         cmd = [
             self.nvme_cli,
             "id-ctrl",
             self.device
         ]
-        options = self.parametrizeOpcionsLogs(verbose, json_output, binary_raw)
+        options = self.parametrizeOpcionsLogs(**kwargs)
         cmd.extend(options)
         
         output = self.run_command(cmd)
         
-        if json_output:
+        if kwargs.get('json_output', False) and output:
             output = json.loads(output)
         return output
         
@@ -229,8 +227,42 @@ class NvmeCommands():
     def copy(self):
         pass
 
+    
+    def parametrizeOpcionesConfigGeneral(self, nsid=None, controllers=None, json_output=None, verbose=None ):
+        options = []
+        
+        # Agregar opciones de configuración según los argumentos
+        if nsid is not None:
+            options.append(["-n", str(nsid)])
+        if controllers is not None:
+            options.append(["-c", str(controllers)])
+        if json_output:
+            options.append("--output-format=json")
+        if verbose:
+              options.append("-v")
+     
+        
+        return options
+
     # --- Comandos de configuración ---
-    def set_feature(self, **kwargs):
+    def id_ns(self,**kwargs):
+        cmd = [
+            self.nvme_cli,
+            "id-ns",
+            self.device
+        ]
+        
+        # Agregar opciones de configuración usando la función parametrize
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
+        cmd.extend(config_options)
+        
+        output = self.run_command(cmd)
+        
+        if kwargs.get('json_output', False) and output:
+            output = json.loads(output)
+            
+        return output
+    def set_feature(self,**kwargs ):
         cmd = [
             self.nvme_cli,
             "set-feature",
@@ -238,7 +270,7 @@ class NvmeCommands():
         ]
         
         # Agregar opciones de configuración usando la función parametrize
-        config_options = self.parametrizeOpcionsConfig(**kwargs)
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
         cmd.extend(config_options)
         
         output = self.run_command(cmd)
@@ -247,7 +279,7 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
-    def get_property(self, **kwargs):
+    def get_property(self,**kwargs ):
         cmd = [
             self.nvme_cli,
             "get-property",
@@ -255,7 +287,7 @@ class NvmeCommands():
         ]
         
         # Agregar opciones de configuración usando la función parametrize
-        config_options = self.parametrizeOpcionsConfig(**kwargs)
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
         cmd.extend(config_options)
         
         output = self.run_command(cmd)
@@ -264,7 +296,7 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
-    def set_property(self, **kwargs):
+    def set_property(self,**kwargs):
         cmd = [
             self.nvme_cli,
             "set-property",
@@ -272,7 +304,7 @@ class NvmeCommands():
         ]
         
         # Agregar opciones de configuración usando la función parametrize
-        config_options = self.parametrizeOpcionsConfig(**kwargs)
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
         cmd.extend(config_options)
         
         output = self.run_command(cmd)
@@ -289,7 +321,7 @@ class NvmeCommands():
         ]
         
         # Agregar opciones de configuración usando la función parametrize
-        config_options = self.parametrizeOpcionsConfig(**kwargs)
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
         cmd.extend(config_options)
         
         output = self.run_command(cmd)
@@ -298,6 +330,7 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
+
     def ns_detach(self, **kwargs):
         cmd = [
             self.nvme_cli,
@@ -306,7 +339,7 @@ class NvmeCommands():
         ]
         
         # Agregar opciones de configuración usando la función parametrize
-        config_options = self.parametrizeOpcionsConfig(**kwargs)
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
         cmd.extend(config_options)
         
         output = self.run_command(cmd)
@@ -332,7 +365,7 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
-    def delete_ns(self, **kwargs):
+    def delete_ns(self, **kwargs ):
         cmd = [
             self.nvme_cli,
             "delete-ns",
@@ -340,7 +373,7 @@ class NvmeCommands():
         ]
         
         # Agregar opciones de configuración usando la función parametrize
-        config_options = self.parametrizeOpcionsConfig(**kwargs)
+        config_options = self.parametrizeOpcionesConfigGeneral(**kwargs)
         cmd.extend(config_options)
         
         output = self.run_command(cmd)
@@ -349,7 +382,7 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
-    def ns_rescan(self, **kwargs):
+    def ns_rescan(self,**kwargs):
         cmd = [
             self.nvme_cli,
             "ns-rescan",

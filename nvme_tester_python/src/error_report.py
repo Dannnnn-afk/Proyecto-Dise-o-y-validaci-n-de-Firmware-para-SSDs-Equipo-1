@@ -1,6 +1,4 @@
 
-
-
 class ErrorReport():
     """
     Class to handle error reporting in NVMe tests.
