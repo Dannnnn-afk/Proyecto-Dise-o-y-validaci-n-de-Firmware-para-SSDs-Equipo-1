@@ -1,17 +1,15 @@
-from ..tests.test_logger import TestLogger
+from logger import TestLogger
 from nvme_wrapper import NvmeCommands
-
 from ..tests.test_id_control import TestCases as TestIdControl
-from ..tests.test_logger import TestCases as TestIdControl
 from ..tests.test_smart_log import TestCases as TestIdControl
-from ..tests.test_smart_log_healt import TestCases as TestIdControl
-
+from ..tests.test_smart_log_healt import TestCases as TestIdContr
 
 # Define set of available tests
 tests_pool = {
-    
-    
-             
+    "test_id_control": TestIdControl,
+    "test_smart_log": TestIdControl,
+    "test_smart_log_healt": TestIdControl,
+    # Add more tests as needed  
               }
 
 
@@ -47,14 +45,17 @@ class TestManager(object):
 
     def run(self):
         # Logar un mensaje de inicio, correr la prueba y logar el final de la pureba
+        TestLogger.info(f"Running test: {self.testname} for device {self.physical_path}")
         pass
 
     def set_final_result(self):
         # Zona de validacion de resultados y log de resultados
+        
         pass
 
     def drive_check(self, discovery=True):
         # Proceso de discovery del drive y sanidad del drive
+        
         pass
 
     def get_device_path(self, serial_number, nvme_list):
