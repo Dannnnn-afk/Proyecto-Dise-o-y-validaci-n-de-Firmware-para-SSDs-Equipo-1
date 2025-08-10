@@ -27,13 +27,10 @@ class TestLogger:
         log_dir = "logs"
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
-
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         log_file = os.path.join(log_dir, f"{self.name}_{timestamp}.log")
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(logging.DEBUG)
-
-        # Formato detallado para archivo
         file_format = logging.Formatter(
             '%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s'
         )
