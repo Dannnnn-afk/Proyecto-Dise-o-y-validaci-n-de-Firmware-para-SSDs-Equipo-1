@@ -1,33 +1,48 @@
-#!/usr/bin/env python3
-import os
 import json
-import subprocess
-import sys
-from ..src.nvme_wrapper import NvmeCommands
-from jsondiff import diff
-from ..src.logger import TestLogger
-from ..src.test_manager import TestManager
+from src.nvme_wrapper import NvmeCommands
+from src.logger import TestLogger
 
-myIDControlTest = TestManager("PHA42142004Y1P2A", "test_id_control")
+class NvmeIdCtrlTest:
+    def __init__(self, nvme_wrapper, logger):
+        self.nvme = nvme_wrapper
+        self.logger = logger
+    
+    def run(self, reference_file_path):
+        self.logger.log_test_start("test_id_ctrl")
+        
+        output = self.nvme.idctrol(json_output=True)
+        if output is None:
+            self.logger.log_test_end("test_id_ctrl", "FAIL")
+            return False
+        
+        with open(reference_file_path, "r") as f:
+            reference = json.load(f)
+        
+        ignore_fields = ["sn", "fguid", "unvmcap", "subnqn"]
+        errors = 0
+        
+        for key, expected_value in reference.items():
+            if key in ignore_fields:
+                continue
+            actual_value = output.get(key)
+            if actual_value != expected_value:
+                errors += 1
+                self.logger.error(f"Error en campo '{key}': esperado '{expected_value}', encontrado '{actual_value}'")
+            else:
+                self.logger.info(f"Campo '{key}' coincide: {actual_value}")
+        
+        if errors == 0:
+            self.logger.log_test_end("test_id_ctrl", "PASS")
+            return True
+        else:
+            self.logger.log_test_end("test_id_ctrl", "FAIL")
+            return False
 
-IGNORE_FIELDS = {"sn", "fguid", "unvmcap", "subnqn"}
 
-class idControlTest:
-    def __init__(self, serial_number, testname):
-        self.serial_number = serial_number
-        self.testname = testname
-        self.nvme = None
-        self.physical_path = None
-        self.logger = TestLogger(self.testname).initialize_logger()
-        self.test = None
+# --- Esto es para testear el archivo directamente ---
 
-        if self.initialize() is None:
-            self.logger.error(f"Unable to get Physical Path for SN: {self.serial_number}")
-            return
-
-        if testname not in tests_pool:
-            test_list = list(tests_pool.keys())
-            self.logger.error(f"Test {testname} was not found. Tests Available: {test_list}")
-            self.logger.error(f"Make sure the test you are trying to execute has been defined.")
-            return
-        self.test = tests_pool[self.testname](self.logger, self.nvme)
+if __name__ == "__main__":
+    logger = TestLogger("id_ctrl_test").initialize_logger()
+    nvme = NvmeCommands(logger)
+    test = NvmeIdCtrlTest(nvme, logger)
+    test.run("tests/id-ctrl-main.json")  # Ruta relativa al JSON de referencia
