@@ -1,0 +1,16 @@
+# Testing framework
+pytest>=7.0.0
+pytest-html>=3.1.0
+
+# Console output formatting
+colorama>=0.4.0
+rich>=10.0.0
+
+# Standard library dependencies (included with Python)
+# json - Built-in module for JSON handling
+# subprocess - Built-in module for running system commands
+# logging - Built-in module for logging functionality
+# os - Built-in module for operating system interface
+# datetime - Built-in module for date and time handling
+# re - Built-in module for regular expressions
+# sys - Built-in module for system-specific parameters

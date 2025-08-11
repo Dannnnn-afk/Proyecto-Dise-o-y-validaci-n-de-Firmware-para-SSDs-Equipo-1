@@ -50,7 +50,7 @@ UIDX_BIT = 0
 UIDX_MASK = 0x7f << UIDX_BIT
 
 class passthruSmartLog(AdminPassthru):
-   def get_smart_log(self, csi=0, ot=0, uidx=0, nsid=0, lid=0, rae=0, numdl=0, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0):
+   def get_smart_log(self, csi=0, ot=0, uidx=0, nsid=0, lid=0, rae=0, numdl=0, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0,dataLen=0):
         sqe = SubmissionQueueEntry()
         sqe.NSID = nsid
         sqe.OPC = OPC_get_SMART_LOG
@@ -85,7 +85,7 @@ class passthruSmartLog(AdminPassthru):
                                                                           latency=True,
                                                                           raw_binary=True,
                                                                           read=True,
-                                                                          data_len=4,
+                                                                          data_len=dataLen,
                                                                           device_path=device)
         except:
             return None

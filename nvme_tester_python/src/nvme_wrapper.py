@@ -1,9 +1,8 @@
 import subprocess
 import json
+from datetime import datetime
 
 from ..src.logger import TestLogger
-
-
 
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
@@ -11,22 +10,28 @@ NVME = "nvme"
 
 class NvmeCommands():
     def __init__(self, logger, device=DEVICE, nvme_cli=NVME):
+        if logger is None:
+            raise ValueError("You require logger instance object from logger.py Class")
         self.logger = logger
         self.device = device
         self.nvme_cli = nvme_cli
+        self.logger.info("NvmeCommands initialized (device=%s, nvme_cli=%s)", self.device, self.nvme_cli)
+
 
     def run_command(self, cmd):
-        command = " ".join(cmd)
-        self.logger.debug(f"Executing command: {command}")
+        if isinstance(cmd, (list, tuple)):
+            command = " ".join(cmd)
+        else:
+            command = str(cmd)
+        self.logger.info(f"Executing command: {command}")
         try:
             run_cmd = subprocess.run(cmd, capture_output=True, text=True, check=True)
             return run_cmd.stdout
         except subprocess.CalledProcessError as e:
-            
-            self.logger.error(f"Error found during execution")
-            self.logger.error(f"Return Code: {e.returncode}")
-            self.logger.error(f"STDout: {e.stdout}")
-            self.logger.error(f"STDError: {e.stderr}")
+            self.logger.info(f"Error found during execution")
+            self.logger.info(f"Return Code: {e.returncode}")
+            self.logger.info(f"STDout: {e.stdout}")
+            self.logger.info(f"STDError: {e.stderr}")
             return None
 
     def parametrizeOpcionsLogs(self, verbose=False, json_output=False, binary_raw=False):
@@ -163,7 +168,6 @@ class NvmeCommands():
         ]
         options = self.parametrizeOpcionsLogs(**kwargs)
         cmd.extend(options)
-        #Logger 
         
         output = self.run_command(cmd)
         
@@ -208,10 +212,247 @@ class NvmeCommands():
         pass
 
     # --- Comandos de I/O y testing ---
-    def read(self):
-        pass
-    def write(self):
-        pass
+    def read(self, start_block=None, block_count=None, data_size=None, metadata_size=None, 
+             ref_tag=None, data=None, metadata=None, prinfo=None, app_tag_mask=None, 
+             app_tag=None, limited_retry=False, force_unit_access=False, dir_type=None, 
+             dir_spec=None, dsm=None, show_command=False, dry_run=False, latency=False, 
+             storage_tag=None, storage_tag_check=False, force=False, timeout=None, **kwargs):
+        """
+        Ejecuta comando NVMe read con los parámetros especificados.
+        
+        Args:
+            start_block: Bloque lógico de inicio (SLBA)
+            block_count: Número de bloques lógicos (NLB)
+            data_size: Tamaño de datos
+            metadata_size: Tamaño de metadatos
+            ref_tag: Etiqueta de referencia
+            data: Archivo de datos
+            metadata: Archivo de metadatos
+            prinfo: Información de protección
+            app_tag_mask: Máscara de etiqueta de aplicación
+            app_tag: Etiqueta de aplicación
+            limited_retry: Retry limitado
+            force_unit_access: Forzar acceso a unidad
+            dir_type: Tipo de directiva
+            dir_spec: Especificación de directiva
+            dsm: Dataset Management
+            show_command: Mostrar comando
+            dry_run: Ejecución en seco
+            latency: Mostrar latencia
+            storage_tag: Etiqueta de almacenamiento
+            storage_tag_check: Verificación de etiqueta de almacenamiento
+            force: Forzar operación
+            timeout: Tiempo de espera
+            **kwargs: Opciones adicionales (json_output, verbose)
+        """
+        cmd = [
+            self.nvme_cli,
+            "read",
+            self.device
+        ]
+        
+        # Parámetros básicos
+        if start_block is not None:
+            cmd.extend(["--start-block", str(start_block)])
+            
+        if block_count is not None:
+            cmd.extend(["--block-count", str(block_count)])
+            
+        if data_size is not None:
+            cmd.extend(["--data-size", str(data_size)])
+            
+        if metadata_size is not None:
+            cmd.extend(["--metadata-size", str(metadata_size)])
+            
+        if ref_tag is not None:
+            cmd.extend(["--ref-tag", str(ref_tag)])
+            
+        if data is not None:
+            cmd.extend(["--data", str(data)])
+            
+        if metadata is not None:
+            cmd.extend(["--metadata", str(metadata)])
+            
+        if prinfo is not None:
+            cmd.extend(["--prinfo", str(prinfo)])
+            
+        if app_tag_mask is not None:
+            cmd.extend(["--app-tag-mask", str(app_tag_mask)])
+            
+        if app_tag is not None:
+            cmd.extend(["--app-tag", str(app_tag)])
+            
+        # Flags booleanos
+        if limited_retry:
+            cmd.append("--limited-retry")
+            
+        if force_unit_access:
+            cmd.append("--force-unit-access")
+            
+        if dir_type is not None:
+            cmd.extend(["--dir-type", str(dir_type)])
+            
+        if dir_spec is not None:
+            cmd.extend(["--dir-spec", str(dir_spec)])
+            
+        if dsm is not None:
+            cmd.extend(["--dsm", str(dsm)])
+            
+        if show_command:
+            cmd.append("--show-command")
+            
+        if dry_run:
+            cmd.append("--dry-run")
+            
+        if latency:
+            cmd.append("--latency")
+            
+        if storage_tag is not None:
+            cmd.extend(["--storage-tag", str(storage_tag)])
+            
+        if storage_tag_check:
+            cmd.append("--storage-tag-check")
+            
+        if force:
+            cmd.append("--force")
+            
+        if timeout is not None:
+            cmd.extend(["--timeout", str(timeout)])
+        
+        # Agregar opciones de logging
+        log_options = self.parametrizeOpcionsLogs(**kwargs)
+        cmd.extend(log_options)
+        
+        output = self.run_command(cmd)
+        
+        if kwargs.get('json_output', False) and output:
+            try:
+                output = json.loads(output)
+            except json.JSONDecodeError:
+                self.logger.warning("Failed to parse JSON output from read command")
+                
+        return output
+        
+    def write(self, start_block=None, block_count=None, data_size=None, metadata_size=None, 
+              ref_tag=None, data=None, metadata=None, prinfo=None, app_tag_mask=None, 
+              app_tag=None, limited_retry=False, force_unit_access=False, dir_type=None, 
+              dir_spec=None, dsm=None, show_command=False, dry_run=False, latency=False, 
+              storage_tag=None, storage_tag_check=False, force=False, timeout=None, **kwargs):
+        """
+        Ejecuta comando NVMe write con los parámetros especificados.
+        
+        Args:
+            start_block: Bloque lógico de inicio (SLBA)
+            block_count: Número de bloques lógicos (NLB)
+            data_size: Tamaño de datos
+            metadata_size: Tamaño de metadatos
+            ref_tag: Etiqueta de referencia
+            data: Archivo de datos
+            metadata: Archivo de metadatos
+            prinfo: Información de protección
+            app_tag_mask: Máscara de etiqueta de aplicación
+            app_tag: Etiqueta de aplicación
+            limited_retry: Retry limitado
+            force_unit_access: Forzar acceso a unidad
+            dir_type: Tipo de directiva
+            dir_spec: Especificación de directiva
+            dsm: Dataset Management
+            show_command: Mostrar comando
+            dry_run: Ejecución en seco
+            latency: Mostrar latencia
+            storage_tag: Etiqueta de almacenamiento
+            storage_tag_check: Verificación de etiqueta de almacenamiento
+            force: Forzar operación
+            timeout: Tiempo de espera
+            **kwargs: Opciones adicionales (json_output, verbose)
+        """
+        cmd = [
+            self.nvme_cli,
+            "write",
+            self.device
+        ]
+        
+        # Parámetros básicos
+        if start_block is not None:
+            cmd.extend(["--start-block", str(start_block)])
+            
+        if block_count is not None:
+            cmd.extend(["--block-count", str(block_count)])
+            
+        if data_size is not None:
+            cmd.extend(["--data-size", str(data_size)])
+            
+        if metadata_size is not None:
+            cmd.extend(["--metadata-size", str(metadata_size)])
+            
+        if ref_tag is not None:
+            cmd.extend(["--ref-tag", str(ref_tag)])
+            
+        if data is not None:
+            cmd.extend(["--data", str(data)])
+            
+        if metadata is not None:
+            cmd.extend(["--metadata", str(metadata)])
+            
+        if prinfo is not None:
+            cmd.extend(["--prinfo", str(prinfo)])
+            
+        if app_tag_mask is not None:
+            cmd.extend(["--app-tag-mask", str(app_tag_mask)])
+            
+        if app_tag is not None:
+            cmd.extend(["--app-tag", str(app_tag)])
+            
+        # Flags booleanos
+        if limited_retry:
+            cmd.append("--limited-retry")
+            
+        if force_unit_access:
+            cmd.append("--force-unit-access")
+            
+        if dir_type is not None:
+            cmd.extend(["--dir-type", str(dir_type)])
+            
+        if dir_spec is not None:
+            cmd.extend(["--dir-spec", str(dir_spec)])
+            
+        if dsm is not None:
+            cmd.extend(["--dsm", str(dsm)])
+            
+        if show_command:
+            cmd.append("--show-command")
+            
+        if dry_run:
+            cmd.append("--dry-run")
+            
+        if latency:
+            cmd.append("--latency")
+            
+        if storage_tag is not None:
+            cmd.extend(["--storage-tag", str(storage_tag)])
+            
+        if storage_tag_check:
+            cmd.append("--storage-tag-check")
+            
+        if force:
+            cmd.append("--force")
+            
+        if timeout is not None:
+            cmd.extend(["--timeout", str(timeout)])
+        
+        # Agregar opciones de logging
+        log_options = self.parametrizeOpcionsLogs(**kwargs)
+        cmd.extend(log_options)
+        
+        output = self.run_command(cmd)
+        
+        if kwargs.get('json_output', False) and output:
+            try:
+                output = json.loads(output)
+            except json.JSONDecodeError:
+                self.logger.warning("Failed to parse JSON output from write command")
+                
+        return output
     def write_zeros(self):
         pass
     def write_uncor(self):
@@ -365,6 +606,7 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
+    
     def delete_ns(self, **kwargs ):
         cmd = [
             self.nvme_cli,
@@ -399,7 +641,76 @@ class NvmeCommands():
             output = json.loads(output)
             
         return output
-
+    
+    def format_ns(self, nsid=None, lbaf=None, block_size=None, ses=None, pil=None, 
+                  pi=None, ms=None, reset=False, force=False, timeout=None, **kwargs):
+        """
+        Ejecuta comando NVMe format con los parámetros especificados.
+        
+        Args:
+            nsid: Namespace ID
+            lbaf: LBA Format (Logical Block Address Format)
+            block_size: Tamaño del bloque
+            ses: Secure Erase Settings
+            pil: Protection Information Location
+            pi: Protection Information
+            ms: Metadata Settings
+            reset: Reset flag
+            force: Force flag
+            timeout: Tiempo de espera
+            **kwargs: Opciones adicionales (json_output, verbose)
+        """
+        cmd = [
+            self.nvme_cli,
+            "format",
+            self.device
+        ]
+        
+        # Parámetros básicos
+        if nsid is not None:
+            cmd.extend(["--namespace-id", str(nsid)])
+            
+        if lbaf is not None:
+            cmd.extend(["--lbaf", str(lbaf)])
+            
+        if block_size is not None:
+            cmd.extend(["--block-size", str(block_size)])
+            
+        if ses is not None:
+            cmd.extend(["--ses", str(ses)])
+            
+        if pil is not None:
+            cmd.extend(["--pil", str(pil)])
+            
+        if pi is not None:
+            cmd.extend(["--pi", str(pi)])
+            
+        if ms is not None:
+            cmd.extend(["--ms", str(ms)])
+            
+        # Flags booleanos
+        if reset:
+            cmd.append("--reset")
+            
+        if force:
+            cmd.append("--force")
+            
+        if timeout is not None:
+            cmd.extend(["--timeout", str(timeout)])
+        
+        # Agregar opciones de logging
+        log_options = self.parametrizeOpcionsLogs(**kwargs)
+        cmd.extend(log_options)
+        
+        output = self.run_command(cmd)
+        
+        if kwargs.get('json_output', False) and output:
+            try:
+                output = json.loads(output)
+            except json.JSONDecodeError:
+                self.logger.warning("Failed to parse JSON output from format command")
+                
+        return output
     # --- Comandos de seguridad ---
     def security_send(self):
         pass
@@ -445,12 +756,3 @@ class NvmeCommands():
         pass
     def monitor(self):
         pass
-    
-
-
-test_logger = TestLogger("Prueba1")
-logger = test_logger.initialize_logger()
-
-nvme = NvmeCommands(logger)
-list_output = nvme.list()
-logger.debug(list_output)
