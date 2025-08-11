@@ -1,14 +1,15 @@
 from logger import TestLogger
 from nvme_wrapper import NvmeCommands
-from ..tests.test_id_control import TestCases as TestIdControl
-from ..tests.test_smart_log import TestCases as TestIdControl
-from ..tests.test_smart_log_healt import TestCases as TestIdContr
+
+from ..tests.test_id_control import NvmeIdCtrlTest as  testIdControl
+from ..tests.test_smart_log import TestSmartLogTemperature as NvmeSmartLogTemperatureTest
+from ..tests.test_smart_log_healt import TestSmartLogHealt as testSmartLogHealt
 
 # Define set of available tests
 tests_pool = {
-    "test_id_control": TestIdControl,
-    "test_smart_log": TestIdControl,
-    "test_smart_log_healt": TestIdControl,
+    "test_id_control": testIdControl,
+    "test_smart_log": NvmeSmartLogTemperatureTest,
+    "test_smart_log_healt": testSmartLogHealt,
     # Add more tests as needed  
               }
 
@@ -45,7 +46,9 @@ class TestManager(object):
 
     def run(self):
         # Logar un mensaje de inicio, correr la prueba y logar el final de la pureba
+        testIdControl.run(self.physical_path)
         TestLogger.info(f"Running test: {self.testname} for device {self.physical_path}")
+       
         pass
 
     def set_final_result(self):
@@ -63,9 +66,9 @@ class TestManager(object):
         pass
 
 
-my_test = TestManager("PHA42142004Y1P2A", "test_read_write")
-if my_test.test is not None:
-    my_test.drive_check(discovery=True)
-    my_test.run()
-    my_test.set_final_result()
-    my_test.drive_check(discovery=False)
+# my_test = TestManager("PHA42142004Y1P2A", "test_read_write")
+# if my_test.test is not None:
+#     my_test.drive_check(discovery=True)
+#     my_test.run()
+#     my_test.set_final_result()
+#     my_test.drive_check(discovery=False)

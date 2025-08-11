@@ -45,7 +45,7 @@ class TestLogger:
         test_name (str): Test Case (TC) name.
         """
         self.info(f"TEST START: {test_name}")
-        self.debug(f"Test {test_name} started at {datetime.now()}")
+        self.info(f"Test {test_name} started at {datetime.now()}")
 
     def log_test_end(self, test_name, result):
         """
@@ -57,21 +57,21 @@ class TestLogger:
         if result.upper() == "PASS":
             self.info(f" TEST COMPLETED: {test_name} - {result}")
         else:
-            self.error(f" TEST FAILED: {test_name} - {result}")
-        self.debug(f"Test {test_name} ended at {datetime.now()}")
+            self.info(f" TEST FAILED: {test_name} - {result}")
+        self.info(f"Test {test_name} ended at {datetime.now()}")
 
     def log_command(self, command, result):
         """
         Stop logger.
         Input:
         command (str): full command.
-        result (int): output of command.
+        result (str): output of command.
         """
         if result == 0:
             self.info(f"Comando ejecutado: {command}")
         else:
-            self.error(f"Error en comando: {command} - {result}")
-        self.debug(f"Command details: {command} -> {result}")
+            self.info(f"Error en comando: {command} - {result}")
+        self.info(f"Command details: {command} -> {result}")
 
     def set_level(self, level):
         """
