@@ -1,7 +1,5 @@
 import json
-from src.nvme_wrapper import NvmeCommands
-from src.logger import TestLogger
-
+import subprocess
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
 
@@ -11,6 +9,15 @@ class NvmeIdCtrlTest:
         #self.logger = logger
         self.device = device
         self.nvme_cli = nvme_cli
+        
+    def run_command(self, cmd):
+        command = " ".join(cmd)
+        print(f"Executing command: {command}")
+        try:
+            run_cmd = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            return run_cmd.stdout
+        except subprocess.CalledProcessError as e:
+            return None
 
     def idctrol(self, **kwargs):
         cmd = [
@@ -20,12 +27,11 @@ class NvmeIdCtrlTest:
         ]
         options = self.parametrizeOpcionsLogs(**kwargs)
         cmd.extend(options)
-
         output = self.run_command(cmd)
-
+    
         if kwargs.get('json_output', False) and output:
             output = json.loads(output)
-        #return output
+        return output
 
     def run(self, reference_file_path):
         # self.logger.log_test_start("test_id_ctrl")
