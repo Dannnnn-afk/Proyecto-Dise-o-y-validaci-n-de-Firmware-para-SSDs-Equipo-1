@@ -1,11 +1,16 @@
 import sys
 import os
 import random
-from ..src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
-from utils.get_smart_log import passthruSmartLog
-from ..src.nvme_wrapper import NvmeCommands
-from ..src.logger import TestLogger
 
+# Add the parent directory to the path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
+from utils.get_smart_log import passthruSmartLog
+from src.nvme_wrapper import NvmeCommands
+from src.logger import TestLogger
+
+#Instanciar dentro de mi objeto de test clase
 smart_Log_InstanceAdminPassthru = passthruSmartLog()
 
 

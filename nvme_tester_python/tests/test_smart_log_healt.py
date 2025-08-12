@@ -1,16 +1,17 @@
 
 import sys
 import os
-from ..src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
-from utils.get_ID_NS_ import passthruID_NS
-from utils.get_smart_log import passthruSmartLog
-from ..src.nvme_wrapper import NvmeCommands
-from ..src.logger import TestLogger
+# Add the parent directory to the path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
+from utils.get_ID_NS import passthruID_NS
+from src.nvme_wrapper import NvmeCommands
+from src.logger import TestLogger
 
+#Instanciar dentro de mi objeto de test clase
 passthruIDInstance = passthruID_NS()
-smart_Log_InstanceAdminPassthru = passthruSmartLog()
 
-
+          
 
 class TestSmartLogHealt():
    
@@ -27,7 +28,9 @@ class TestSmartLogHealt():
         
 
         # - Take initial snapshot with ID-NS command via admin-passthru.
-        cqe_result = passthruIDInstance.get_id_ns(csi=0, ot=0, uidx=0, nsid=1, rae=0, numdl=4095, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)
+        cqe_result = passthruIDInstance.get_ID_NS(cns=0, cntid=0, cnssid=0, uidx=0, nsid=0, device='/dev/nvme0', csi=0)
+        
+        
         self.logger.log_command("passthruIDInstance.get_id_ns(csi=0, ot=0, uidx=0, nsid=1, rae=0, numdl=4095, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)", cqe_result)
         if cqe_result.data_buffer and len(cqe_result.data_buffer) >= 4096:
             self.logger.log_info("get_id_ns executed successfully.")
@@ -70,7 +73,7 @@ class TestSmartLogHealt():
         self.nvme_wrapper.write(start_block=1,block_count=1, data="test_data_smart_log_healt")
 
         # - Take final snapshot with ID-NS via admin-passthru.
-        cqe_result_after = smart_Log_InstanceAdminPassthru.get_smart_log(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, numdl=511, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)
+        cqe_result_after = passthruID_NS.get_ID_NS(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, numdl=511, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)
         self.logger.log_command("smart_Log_InstanceAdminPassthru.get_smart_log(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, " \
                                         "numdl=511, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)", cqe_result)
 
@@ -109,12 +112,6 @@ class TestSmartLogHealt():
             else:
                 self.logger.info("All fields did not match the expected values.")
                 self.logger.log_test_end("test_smart_log_healt", "ERROR")
-                
-            
-
-            
-            
-
 
         # Expected Result: Test is PASSED if all fields match expected values; otherwise, FAILED.
         # Command Line: nvme id-ns /dev/nvme0n1

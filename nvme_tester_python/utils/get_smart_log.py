@@ -1,4 +1,10 @@
-from ..src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
+import sys
+import os
+
+# Add the parent directory to the path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
 
 ### Get Features Consts
 OPC_get_SMART_LOG = 0x02

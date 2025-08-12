@@ -1,9 +1,15 @@
-from logger import TestLogger
-from nvme_wrapper import NvmeCommands
+import sys
+import os
 
-from ..tests.test_id_control import NvmeIdCtrlTest as  testIdControl
-from ..tests.test_smart_log import TestSmartLogTemperature as NvmeSmartLogTemperatureTest
-from ..tests.test_smart_log_healt import TestSmartLogHealt as testSmartLogHealt
+# Add the parent directory to the path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from .logger import TestLogger
+from .nvme_wrapper import NvmeCommands
+
+from tests.test_id_control import NvmeIdCtrlTest as testIdControl
+from tests.test_smart_log import NvmeSmartLogTemperatureTest as NvmeSmartLogTemperatureTest
+from tests.test_smart_log_healt import TestSmartLogHealt as testSmartLogHealt
 
 # Define set of available tests
 tests_pool = {
@@ -20,7 +26,7 @@ class TestManager(object):
         self.testname = testname
         self.nvme = None
         self.physical_path = None
-        self.logger = TestLogger(self.testname).initialize_logger()
+        self.logger = TestLogger(self.testname)
         self.test = None
 
         if self.initialize() is None:
@@ -32,7 +38,7 @@ class TestManager(object):
             self.logger.error(f"Test {testname} was not found. Tests Available: {test_list}")
             self.logger.error(f"Make sure the test you are trying to execute has been defined.")
             return
-        self.test = tests_pool[self.testname](self.logger, self.nvme)
+        self.test = tests_pool[self.testname](self.nvme, self.logger)
 
     def initialize(self):
         # Initialize the NVMe wrapper

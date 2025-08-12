@@ -14,7 +14,7 @@ class TestLogger:
         self.logger.setLevel(logging.INFO)
         
         if not self.logger.handlers:
-            self._setup_handlers()
+            self._setup_handler()
 
     def _setup_handler(self):
         """
