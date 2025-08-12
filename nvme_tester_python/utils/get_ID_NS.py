@@ -1,4 +1,10 @@
-from ..src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
+import sys
+import os
+
+# Add the parent directory to the path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.admin_passthru_wrappper import AdminPassthru, SubmissionQueueEntry, CompletionQueueEntry
 
 ### Get Features Consts
 OPC_GET_ID_NS = 0x06
@@ -34,7 +40,7 @@ UIDX_BIT = 0
 UIDX_MASK = 0x7f << UIDX_BIT
 
 
-class passthruSmartLog(AdminPassthru):
+class passthruID_NS(AdminPassthru):
    def get_ID_NS(self, cns=0, cntid=0, cnssid=0, uidx=0, nsid=0, device='/dev/nvme0', csi=0):
         sqe = SubmissionQueueEntry()
         sqe.NSID = nsid

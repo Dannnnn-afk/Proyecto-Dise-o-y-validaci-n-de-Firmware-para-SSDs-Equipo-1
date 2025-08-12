@@ -1,4 +1,10 @@
 import json
+import sys
+import os
+
+# Add the parent directory to the path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.nvme_wrapper import NvmeCommands
 from src.logger import TestLogger
 
@@ -41,11 +47,3 @@ class NvmeIdCtrlTest:
             self.logger.log_test_end("test_id_ctrl", "FAIL")
             return False
 
-
-# --- Esto es para testear el archivo directamente ---
-
-if __name__ == "__main__":
-    logger = TestLogger("id_ctrl_test")
-    nvme = NvmeCommands(logger)
-    test = NvmeIdCtrlTest(nvme, logger)
-    test.run("tests/id-ctrl-main.json")  # Ruta relativa al JSON de referencia

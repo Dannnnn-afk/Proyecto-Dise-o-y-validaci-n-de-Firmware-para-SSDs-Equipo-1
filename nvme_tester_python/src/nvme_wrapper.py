@@ -2,7 +2,7 @@ import subprocess
 import json
 from datetime import datetime
 
-from ..src.logger import TestLogger
+from .logger import TestLogger
 
 DEVICE = "/dev/nvme0"
 NVME = "nvme"
@@ -15,7 +15,7 @@ class NvmeCommands():
         self.logger = logger
         self.device = device
         self.nvme_cli = nvme_cli
-        self.logger.info("NvmeCommands initialized (device=%s, nvme_cli=%s)", self.device, self.nvme_cli)
+        self.logger.info(f"NvmeCommands initialized (device={self.device}, nvme_cli={self.nvme_cli})")
 
 
     def run_command(self, cmd):
