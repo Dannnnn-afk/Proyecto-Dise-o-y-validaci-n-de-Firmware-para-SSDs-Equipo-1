@@ -73,7 +73,7 @@ class TestSmartLogHealt():
         self.nvme_wrapper.write(start_block=1,block_count=1, data="test_data_smart_log_healt")
 
         # - Take final snapshot with ID-NS via admin-passthru.
-        cqe_result_after = passthruID_NS.get_ID_NS(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, numdl=511, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)
+        cqe_result_after = passthruID_NS.get_ID_NS(cns=0, cntid=0, cnssid=0, uidx=0, nsid=0, device='/dev/nvme0', csi=0)
         self.logger.log_command("smart_Log_InstanceAdminPassthru.get_smart_log(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, " \
                                         "numdl=511, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)", cqe_result)
 

@@ -41,7 +41,7 @@ class NvmeSmartLogTemperatureTest():
             #     List = [00 00 00 00 00 00]
 
             List = ["00 00 00 00 00 00"]
-            cqe_result = smart_Log_InstanceAdminPassthru.get_smart_log(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, numdl=511, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)
+            cqe_result = smart_Log_InstanceAdminPassthru.get_smart_log(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, numdl=127, lsp=0, device='/dev/nvme0', lopl=0, lpou=0, lsi=0, numdu=0)
             
             
             self.logger.log_command("smart_Log_InstanceAdminPassthru.get_smart_log(csi=0, ot=0, uidx=0, nsid=0, lid=2, rae=0, " \
