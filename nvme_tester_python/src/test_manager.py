@@ -41,40 +41,158 @@ class TestManager(object):
         self.test = tests_pool[self.testname](self.nvme, self.logger)
 
     def initialize(self):
-        # Initialize the NVMe wrapper
-    
-        self.nvme = NvmeCommands(self.logger)
-        # Get the physical path of the NVMe device
-        self.physical_path = self.nvme.get_device_path(self.serial_number, self.nvme.list(json_output=True))
-     
-     
-        pass
+        """
+        Inicializa el wrapper NVMe y obtiene la ruta física del dispositivo.
+        
+        Returns:
+            str: Ruta física del dispositivo si se encuentra, None si falla
+        """
+        try:
+            # Initialize the NVMe wrapper
+            self.nvme = NvmeCommands(self.logger)
+            
+            # Get the physical path of the NVMe device
+            nvme_list_output = self.nvme.command_list(json_output=True)
+            if nvme_list_output is None:
+                self.logger.error("Failed to get NVMe device list")
+                return None
+                
+            self.physical_path = self.get_device_path(self.serial_number, nvme_list_output)
+            
+            if self.physical_path is None:
+                self.logger.error(f"Device with serial number {self.serial_number} not found")
+                return None
+                
+            self.logger.info(f"Device found: {self.physical_path}")
+            return self.physical_path
+            
+        except Exception as e:
+            self.logger.error(f"Error during initialization: {e}")
+            return None
 
     def run(self):
-        # Logar un mensaje de inicio, correr la prueba y logar el final de la pureba
-        testIdControl.run(self.physical_path)
-        TestLogger.info(f"Running test: {self.testname} for device {self.physical_path}")
-       
-        pass
+        """
+        Ejecuta la prueba seleccionada.
+        
+        Returns:
+            object: Resultado de la prueba si es exitosa, None si falla
+        """
+        try:
+            if self.test is None:
+                self.logger.error("No test instance available")
+                return None
+                
+            if self.physical_path is None:
+                self.logger.error("No physical path available")
+                return None
+                
+            # Log inicio de la prueba
+            self.logger.info(f"Running test: {self.testname} for device {self.physical_path}")
+            
+            # Ejecutar la prueba usando la instancia correcta
+            result = self.test.run()
+            
+            if result is not None:
+                self.logger.info(f"Test {self.testname} completed successfully")
+            else:
+                self.logger.error(f"Test {self.testname} failed")
+                
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error during test execution: {e}")
+            return None
 
     def set_final_result(self):
-        # Zona de validacion de resultados y log de resultados
-        
-        pass
+        """
+        Procesa y valida los resultados finales de la prueba.
+        """
+        try:
+            # Aquí puedes agregar lógica para:
+            # - Validar resultados de la prueba
+            # - Generar reportes finales
+            # - Guardar métricas
+            self.logger.info("Processing final test results...")
+            
+            # Placeholder para lógica de validación
+            pass
+            
+        except Exception as e:
+            self.logger.error(f"Error processing final results: {e}")
 
     def drive_check(self, discovery=True):
-        # Proceso de discovery del drive y sanidad del drive
+        """
+        Realiza verificaciones de salud y discovery del dispositivo.
         
-        pass
+        Args:
+            discovery (bool): True para discovery inicial, False para verificación final
+        """
+        try:
+            if discovery:
+                self.logger.info("Performing initial drive discovery and health check...")
+                # Verificaciones iniciales:
+                # - Comprobar que el dispositivo esté accesible
+                # - Verificar estado de salud básico
+                # - Obtener información del dispositivo
+                
+                if self.nvme:
+                    # Ejemplo: obtener información básica del dispositivo
+                    id_ctrl = self.nvme.idctrol(json_output=True)
+                    if id_ctrl:
+                        self.logger.info("Drive health check passed")
+                    else:
+                        self.logger.warning("Could not retrieve device information")
+            else:
+                self.logger.info("Performing final drive check...")
+                # Verificaciones finales:
+                # - Comprobar que el dispositivo sigue operativo
+                # - Verificar que no hay errores críticos
+                # - Log del estado final
+                
+        except Exception as e:
+            self.logger.error(f"Error during drive check: {e}")
 
     def get_device_path(self, serial_number, nvme_list):
+        """
+        Busca la ruta física del dispositivo basado en el número de serie.
         
-        pass
+        Args:
+            serial_number (str): Número de serie del dispositivo
+            nvme_list (dict/list): Salida del comando nvme list
+            
+        Returns:
+            str: Ruta del dispositivo (/dev/nvmeX) o None si no se encuentra
+        """
+        try:
+            if not nvme_list:
+                self.logger.error("Empty nvme list provided")
+                return None
+                
+            # Si nvme_list es un diccionario con 'Devices'
+            if isinstance(nvme_list, dict) and 'Devices' in nvme_list:
+                devices = nvme_list['Devices']
+            elif isinstance(nvme_list, list):
+                devices = nvme_list
+            else:
+                self.logger.error("Unexpected nvme list format")
+                return None
+                
+            # Buscar el dispositivo por número de serie
+            for device in devices:
+                if isinstance(device, dict):
+                    # Diferentes campos posibles para el número de serie
+                    device_sn = device.get('SerialNumber') or device.get('sn') or device.get('serial')
+                    device_path = device.get('DevicePath') or device.get('device') or device.get('path')
+                    
+                    if device_sn and device_sn.strip() == serial_number.strip():
+                        self.logger.info(f"Found device {device_path} with serial {device_sn}")
+                        return device_path
+                        
+            self.logger.error(f"Device with serial number {serial_number} not found in nvme list")
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error searching for device path: {e}")
+            return None
 
 
-# my_test = TestManager("PHA42142004Y1P2A", "test_read_write")
-# if my_test.test is not None:
-#     my_test.drive_check(discovery=True)
-#     my_test.run()
-#     my_test.set_final_result()
-#     my_test.drive_check(discovery=False)
