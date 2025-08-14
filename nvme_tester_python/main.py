@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Aplicación principal para testing de memorias NVMe.
 

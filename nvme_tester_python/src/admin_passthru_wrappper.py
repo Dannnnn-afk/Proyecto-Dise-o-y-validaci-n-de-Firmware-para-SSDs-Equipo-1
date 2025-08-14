@@ -142,66 +142,40 @@ class CompletionQueueEntry(object):
 
         self.latency, self.data_buffer = self.extract_latency_from_buffer(data_buffer)
 
+        # data_buffer is sometimes too long of an int (i.e. 1024 digits) which causes the conversion to bytearray to fail
+        # To avoid this, we need to convert it to string
+        if isinstance(self.data_buffer, int):
+            self.data_buffer = str(self.data_buffer)
+
         # data_buffer and metadata_buffer must be passed into SsdAbstractionReturn as a bytearray or None
-        if self.data_buffer is not None:
-            if isinstance(self.data_buffer, bytes):
-                # Direct conversion from bytes to bytearray (best case)
-                self.data_buffer = bytearray(self.data_buffer)
-            elif isinstance(self.data_buffer, int):
-                # Convert int to string, then to bytearray
-                self.data_buffer = bytearray(str(self.data_buffer), encoding='utf-8')
-            elif isinstance(self.data_buffer, str):
-                # Check if string consists of hex values
-                is_hex = re.fullmatch(r"^([0-9a-fA-F]{2})*$", self.data_buffer) is not None
-                if is_hex:
-                    self.data_buffer = bytearray.fromhex(self.data_buffer)
-                else:
-                    # For string data, use latin-1 encoding to preserve byte values 0-255
-                    # This is safer than utf-8 for binary data that was decoded incorrectly
-                    try:
-                        self.data_buffer = bytearray(self.data_buffer, encoding='latin-1')
-                    except UnicodeEncodeError:
-                        # Fallback to utf-8 with error replacement
-                        self.data_buffer = bytearray(self.data_buffer, encoding='utf-8', errors='replace')
-            elif not isinstance(self.data_buffer, bytearray):
-                self.data_buffer = bytearray(self.data_buffer)
+        if self.data_buffer is not None and isinstance(self.data_buffer, str):
+            # Check if string consist of hex values
+            is_hex = re.fullmatch(r"^([0-9a-fA-F]{2})*$", self.data_buffer) is not None
+            if is_hex:
+                self.data_buffer = bytearray.fromhex(self.data_buffer)
+            else:
+                # Need to specify the encoding since data_buffer is a string
+                self.data_buffer = bytearray(encoding=sys.stdout.encoding, source=self.data_buffer)
+        elif self.data_buffer is not None and not isinstance(self.data_buffer, bytearray):
+            self.data_buffer = bytearray(self.data_buffer)
 
     def extract_latency_from_buffer(self, output):
         latency = None
         data_buffer = output
-        #MANEJO DE ERS
-        # Handle binary data properly for raw_binary commands
+        # With Python3 the incoming data_buffer in some cases is bytes from stdout
+        # Need to convert to string so that the latency info can be removed
         if isinstance(data_buffer, bytes):
-            # Try to decode only if we expect text output (latency measurement)
-            try:
-                data_string = output.decode(encoding='utf-8', errors="strict")
-                # Look for latency info in the text
-                match = re.match(r".*latency: (\d+) us\n", data_string)
-                if match is not None:
-                    latency = int(match.group(1))  # latency in microsecs
-                    latency = latency / 1000  # latency in millisecs and is a float value
-                    data_startpos = match.regs[0][1]  # points to the end of match + 1 position
-                    data_buffer = None
-                    if len(output) > data_startpos:
-                        data_buffer = output[data_startpos:]
-                else:
-                    # No latency info found, keep original binary data
-                    data_buffer = output
-            except UnicodeDecodeError:
-                # This is binary data, keep it as-is
-                data_buffer = output
-                
-        elif isinstance(data_buffer, str):
-            # Already string, check for latency
-            match = re.match(r".*latency: (\d+) us\n", data_buffer)
-            if match is not None:
-                latency = int(match.group(1))  # latency in microsecs
-                latency = latency / 1000  # latency in millisecs and is a float value
-                data_startpos = match.regs[0][1]  # points to the end of match + 1 position
-                data_buffer = None
-                if len(output) > data_startpos:
-                    data_buffer = output[data_startpos:]
-                    
+            data_buffer = output.decode(encoding=sys.stdout.encoding, errors="replace")
+        if not isinstance(data_buffer, str) or output is None:
+            return latency, data_buffer
+        match = re.match(r".*latency: (\d+) us\n", data_buffer)
+        if match is not None:
+            latency = int(match.group(1))  # latency in microsecs
+            latency = latency / 1000  # latency in millisecs and is a float value
+            data_startpos = match.regs[0][1]  # points to the end of match + 1 position
+            data_buffer = None
+            if len(output) > data_startpos:
+                data_buffer = output[data_startpos:]
         return latency, data_buffer
 
 
