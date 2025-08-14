@@ -93,9 +93,9 @@ class TestManager(object):
             result = self.test.run()
             
             if result is not None:
-                self.logger.info(f"Test {self.testname} completed successfully")
+                self.logger.info(f"Test {self.testname} execution completed successfully.")
             else:
-                self.logger.error(f"Test {self.testname} failed")
+                self.logger.error(f"Test {self.testname} execution failed")
                 
             return result
             
