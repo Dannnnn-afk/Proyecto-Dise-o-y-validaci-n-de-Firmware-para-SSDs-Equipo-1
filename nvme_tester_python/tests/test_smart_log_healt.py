@@ -21,7 +21,7 @@ class TestSmartLogHealt():
         self.logger = logger  
         
 
-    def run(self, command, *args):
+    def run(self):
         # Test 3: ID-NS
         # Purpose: Create a dynamic test to validate nvme id-ns command is working as expected.
         # Execution Steps:
