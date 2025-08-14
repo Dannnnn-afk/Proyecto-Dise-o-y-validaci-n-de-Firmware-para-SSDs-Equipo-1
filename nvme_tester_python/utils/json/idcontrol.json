@@ -58,7 +58,7 @@
   "nanagrpid":0,
   "pels":80,
   "domainid":0,
-  "megcap":null,
+  "megcap":0,
   "sqes":102,
   "cqes":68,
   "maxcmd":0,
