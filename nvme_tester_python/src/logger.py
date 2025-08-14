@@ -11,6 +11,7 @@ class TestLogger:
         """
         self.name = name
         self.logger = logging.getLogger(name)
+        self.logger.propagate = False
         self.logger.setLevel(logging.INFO)
         
         if not self.logger.handlers:
@@ -83,3 +84,18 @@ class TestLogger:
         for handler in self.logger.handlers:
             if isinstance(handler, logging.StreamHandler) and not isinstance(handler, logging.FileHandler):
                 handler.setLevel(level)
+    
+    def debug(self, message: str):
+        self.logger.debug(str(message))
+
+    def info(self, message: str):
+        self.logger.info(str(message))
+
+    def warning(self, message: str):
+        self.logger.warning(str(message))
+
+    def error(self, message: str):
+        self.logger.error(str(message))
+
+    def critical(self, message: str):
+        self.logger.critical(str(message))
