@@ -10,9 +10,6 @@ file_path = os.path.join(os.path.dirname(os.path.abspath(os.path.join(__file__, 
 from src.nvme_wrapper import NvmeCommands
 from src.logger import TestLogger
 
-file_path = r"nvme_tester_python/utils/json/idcontrol.json"  # Path to the JSON file with expected values
-
-
 class NvmeIdCtrlTest:
     def __init__(self, nvme_wrapper, logger):
         self.nvme = nvme_wrapper
