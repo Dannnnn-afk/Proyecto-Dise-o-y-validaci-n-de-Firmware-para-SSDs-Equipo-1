@@ -392,7 +392,7 @@ class NVMeTestUI:
             
             if result is not None:
                 print(f"Estado: EXITO")
-                print(f"Resultado: {type(result).__name__}")
+                
             else:
                 print(f"Estado: FALLO")
                 print(f"Revise los logs para más detalles")

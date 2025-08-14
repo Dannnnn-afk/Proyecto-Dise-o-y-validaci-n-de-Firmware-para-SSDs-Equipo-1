@@ -4,12 +4,12 @@ from datetime import datetime
 
 from .logger import TestLogger
 
-DEVICE = "/dev/nvme0"
+
 NVME = "nvme"
 
 
 class NvmeCommands():
-    def __init__(self, logger, device=DEVICE, nvme_cli=NVME):
+    def __init__(self, logger, device="/dev/nvme0", nvme_cli=NVME):
         if logger is None:
             raise ValueError("You require logger instance object from logger.py Class")
         self.logger = logger
@@ -126,7 +126,7 @@ class NvmeCommands():
         
         # Allocate Zoned Random Write Area (azr) - asignar área de escritura aleatoria zonificada
         if azr:
-            options.append("--azr")
+            options.extend("--azr")
         
         # Random Area Requested (rar) - área aleatoria solicitada
         if rar is not None:
@@ -333,7 +333,7 @@ class NvmeCommands():
                 
         return output
         
-    def write(self, start_block=None, block_count=None, data_size=None, metadata_size=None, 
+    def write(self, namespace_id=None, start_block=None, block_count=None, data_size=None, metadata_size=None, 
               ref_tag=None, data=None, metadata=None, prinfo=None, app_tag_mask=None, 
               app_tag=None, limited_retry=False, force_unit_access=False, dir_type=None, 
               dir_spec=None, dsm=None, show_command=False, dry_run=False, latency=False, 
@@ -342,6 +342,7 @@ class NvmeCommands():
         Ejecuta comando NVMe write con los parámetros especificados.
         
         Args:
+            namespace_id: ID del namespace
             start_block: Bloque lógico de inicio (SLBA)
             block_count: Número de bloques lógicos (NLB)
             data_size: Tamaño de datos
@@ -371,6 +372,10 @@ class NvmeCommands():
             "write",
             self.device
         ]
+        
+        # Namespace ID parameter
+        if namespace_id is not None:
+            cmd.extend(["--namespace-id", str(namespace_id)])
         
         # Parámetros básicos
         if start_block is not None:
@@ -474,9 +479,9 @@ class NvmeCommands():
         
         # Agregar opciones de configuración según los argumentos
         if nsid is not None:
-            options.append(["-n", str(nsid)])
+            options.extend(["-n", str(nsid)])  # Use extend instead of append
         if controllers is not None:
-            options.append(["-c", str(controllers)])
+            options.extend(["-c", str(controllers)])  # Use extend instead of append
         if json_output:
             options.append("--output-format=json")
         if verbose:
@@ -557,8 +562,8 @@ class NvmeCommands():
     def ns_attach(self, **kwargs):
         cmd = [
             self.nvme_cli,
-            "ns-attach",
-            self.device
+            "attach-ns",
+            "/dev/nvme0",  
         ]
         
         # Agregar opciones de configuración usando la función parametrize
@@ -575,7 +580,7 @@ class NvmeCommands():
     def ns_detach(self, **kwargs):
         cmd = [
             self.nvme_cli,
-            "ns-detach",
+            "detach-ns",
             self.device
         ]
         
@@ -593,7 +598,7 @@ class NvmeCommands():
         cmd = [
             self.nvme_cli,
             "create-ns",
-            self.device
+            "/dev/nvme0"
         ]
         
         # Agregar opciones de configuración usando la función parametrize
@@ -611,7 +616,7 @@ class NvmeCommands():
         cmd = [
             self.nvme_cli,
             "delete-ns",
-            self.device
+            "/dev/nvme0"
         ]
         
         # Agregar opciones de configuración usando la función parametrize

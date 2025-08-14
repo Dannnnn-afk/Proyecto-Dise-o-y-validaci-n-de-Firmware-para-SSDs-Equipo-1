@@ -41,12 +41,12 @@ UIDX_MASK = 0x7f << UIDX_BIT
 
 
 class passthruID_NS(AdminPassthru):
-   def get_ID_NS(self, cns=0, cntid=0, cnssid=0, uidx=0, nsid=0, device='/dev/nvme0', csi=0):
+   def get_ID_NS(self, cns=0, cntid=0, cnssid=0, uidx=0, nsid=0, device='/dev/nvme0', csi=0, dataLen=4096):
         sqe = SubmissionQueueEntry()
         sqe.NSID = nsid
         sqe.OPC = OPC_GET_ID_NS
         
-        
+        # For ID-NS command, CNS=0 means identify namespace
         sqe.DW10 = (cntid << CNTID_BIT) & CNTID_MASK
         sqe.DW10 |= (cns << CNS_BIT) & CNS_MASK
         
@@ -68,16 +68,23 @@ class passthruID_NS(AdminPassthru):
                                                                           latency=True,
                                                                           raw_binary=True,
                                                                           read=True,
-                                                                          data_len=None,
+                                                                          data_len=dataLen,
                                                                           device_path=device)
-        except:
-        
-        
-        
-        
-        
-        
-        
+                
+        except Exception as e:
+            print(f"Error executing admin passthru: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+        # Check if command was successful
+        if return_code != 0:
+            print(f"Admin passthru command failed with return code: {return_code}")
+            print(f"Error: {err}")
+            return None
+            
+        if not output:
+            print("Admin passthru command returned no data")
             return None
 
         cqe = CompletionQueueEntry()
