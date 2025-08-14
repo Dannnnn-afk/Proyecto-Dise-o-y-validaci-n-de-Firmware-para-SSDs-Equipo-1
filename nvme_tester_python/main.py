@@ -276,15 +276,36 @@ class NVMeTestUI:
     
     def show_test_details(self):
         """Muestra información detallada de un test específico"""
-        print("\nINFORMACION DETALLADA DE TESTS")
-        print("-" * 40)
-        
-        for key, test in self.test_cases.items():
-            choice = input(f"Ver detalles del test {key}? (s/n): ").lower()
-            if choice == 's':
-                self.display_test_info(test)
-                input("\nPresione Enter para continuar...")
+        while True:
+            print("\nINFORMACION DETALLADA DE TESTS")
+            print("-" * 40)
+            
+            # Mostrar menú de tests disponibles
+            for key, test in self.test_cases.items():
+                print(f"{key}. {test['description']}")
+            print("0. Volver al menú principal")
+            print("-" * 40)
+            
+            try:
+                choice = input("Seleccione un test para ver detalles: ").strip()
+                
+                # Switch case usando diccionario
+                if choice == "0":
+                    break
+                elif choice in self.test_cases:
+                    test = self.test_cases[choice]
+                    self.display_test_info(test)
+                    input("\nPresione Enter para continuar...")
+                else:
+                    print("Opción inválida. Seleccione un número del menú.")
+                    time.sleep(1)
+                    
+            except KeyboardInterrupt:
+                print("\nVolviendo al menú principal...")
                 break
+            except Exception as e:
+                print(f"Error: {e}")
+                time.sleep(1)
     
     def display_test_info(self, test):
         """Muestra información detallada de un test"""

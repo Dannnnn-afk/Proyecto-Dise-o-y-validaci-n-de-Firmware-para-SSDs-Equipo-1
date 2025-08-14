@@ -208,8 +208,48 @@ class TestSmartLogHealt():
                 
             # Wait for format to complete
             time.sleep(3)
-
+            
+            import random
+            N_times= random.randint(1, 200)  # Random number of writes between 1 and 200
             # - Execute nvme write.
+            self.logger.info(f"Executing write command {N_times} times...")
+            for i in range(N_times):
+                self.logger.info(f"Write iteration {i+1}/{N_times}")
+                # Create a temporary file with test data
+                import tempfile
+                with tempfile.NamedTemporaryFile(mode='w+b', delete=False) as temp_file:
+                    # Write 4096 bytes (to match new block size)
+                    test_data = b'test_data_smart_log_healt' + b'\x00' * (4096 - len(b'test_data_smart_log_healt'))
+                    temp_file.write(test_data)
+                    temp_data_file = temp_file.name
+                
+                try:
+                    write_result = self.nvme_wrapper.write(
+                        start_block=0, 
+                        block_count=1, 
+                        data_size=4096,  # Match the new block size
+                        data=temp_data_file,
+                        namespace_id=1,  # Specify namespace ID
+                        force=True
+                    )
+                    # Note: write_result will be stdout (possibly empty string) on success, None on failure
+                    write_success = write_result is not None
+                    self.logger.info(f"Write result: {write_success}")
+                    if write_success and write_result:
+                        self.logger.info(f"Write output: {write_result}")
+                    elif write_success:
+                        self.logger.info("Write completed successfully (no output)")
+                except Exception as e:
+                    self.logger.error(f"Write failed: {e}")
+                    write_success = False
+                finally:
+                    import os
+                    try:
+                        os.unlink(temp_data_file)
+                    except:
+                        pass
+            
+            
             self.logger.info("Executing write command...")
             import tempfile
             with tempfile.NamedTemporaryFile(mode='w+b', delete=False) as temp_file:
@@ -251,12 +291,14 @@ class TestSmartLogHealt():
                     with tempfile.NamedTemporaryFile(mode='w+b', delete=False) as read_temp_file:
                         read_data_file = read_temp_file.name
                     
+                    # For read operations, make sure we're using the namespace device
+                    # Use the device path directly for read command
                     read_result = self.nvme_wrapper.read(
+                        namespace_id=1,
                         start_block=0,
                         block_count=1,
                         data_size=4096,
-                        data=read_data_file,
-                        namespace_id=1
+                        data=read_data_file
                     )
                     
                     if read_result is not None:

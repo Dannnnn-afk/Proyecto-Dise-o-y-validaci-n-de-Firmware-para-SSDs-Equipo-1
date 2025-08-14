@@ -212,7 +212,7 @@ class NvmeCommands():
         pass
 
     # --- Comandos de I/O y testing ---
-    def read(self, start_block=None, block_count=None, data_size=None, metadata_size=None, 
+    def read(self, namespace_id=None, start_block=None, block_count=None, data_size=None, metadata_size=None, 
              ref_tag=None, data=None, metadata=None, prinfo=None, app_tag_mask=None, 
              app_tag=None, limited_retry=False, force_unit_access=False, dir_type=None, 
              dir_spec=None, dsm=None, show_command=False, dry_run=False, latency=False, 
@@ -221,6 +221,7 @@ class NvmeCommands():
         Ejecuta comando NVMe read con los parámetros especificados.
         
         Args:
+            namespace_id: ID del namespace
             start_block: Bloque lógico de inicio (SLBA)
             block_count: Número de bloques lógicos (NLB)
             data_size: Tamaño de datos
@@ -250,6 +251,10 @@ class NvmeCommands():
             "read",
             self.device
         ]
+        
+        # Namespace ID parameter
+        if namespace_id is not None:
+            cmd.extend(["--namespace-id", str(namespace_id)])
         
         # Parámetros básicos
         if start_block is not None:
