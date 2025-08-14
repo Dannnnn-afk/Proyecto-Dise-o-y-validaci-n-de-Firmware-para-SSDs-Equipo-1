@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.nvme_wrapper import NvmeCommands
 from src.logger import TestLogger
 
-file_path = "nvme_tester_python/utils/json/idcontrol.json/"  # Path to the JSON file with expected values
+file_path = "nvme_tester_python\utils\json\idcontrol.json"  # Path to the JSON file with expected values
 
 
 class NvmeIdCtrlTest:
