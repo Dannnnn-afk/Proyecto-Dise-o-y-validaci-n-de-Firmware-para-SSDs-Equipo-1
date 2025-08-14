@@ -69,12 +69,7 @@ class passthruSmartLog(AdminPassthru):
         sqe.DW11 |= (numdu << NUMDU_BIT) & NUMDU_MASK
         sqe.DW12 = lopl
         sqe.DW13 = lpou
-        sqe.DW14 = (CSI_BIT << CSI_MASK) & CSI_MASK
-        sqe.DW14 |= (OT_BIT << OT_MASK) & OT_MASK
-        
-        #tengo duda aca el RSVD si tiene orden no?
-        #pq no se opera namas se reserva
-        sqe.DW14 |= (csi << CSI_BIT) & CSI_MASK
+        sqe.DW14 = (csi << CSI_BIT) & CSI_MASK
         sqe.DW14 |= (ot << OT_BIT) & OT_MASK
         sqe.DW14 |= (uidx << UIDX_BIT) & UIDX_MASK
         
@@ -93,7 +88,8 @@ class passthruSmartLog(AdminPassthru):
                                                                           read=True,
                                                                           data_len=dataLen,
                                                                           device_path=device)
-        except:
+        except Exception as e:
+            print(f"Error in get_smart_log: {e}")
             return None
         
         cqe = CompletionQueueEntry()

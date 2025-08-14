@@ -48,11 +48,11 @@ class TestManager(object):
             str: Ruta física del dispositivo si se encuentra, None si falla
         """
         try:
-            # Initialize the NVMe wrapper
-            self.nvme = NvmeCommands(self.logger)
+            # Initialize the NVMe wrapper with temporary empty device for device discovery
+            temp_nvme = NvmeCommands(self.logger)
             
             # Get the physical path of the NVMe device
-            nvme_list_output = self.nvme.command_list(json_output=True)
+            nvme_list_output = temp_nvme.command_list(json_output=True)
             if nvme_list_output is None:
                 self.logger.error("Failed to get NVMe device list")
                 return None
@@ -64,6 +64,10 @@ class TestManager(object):
                 return None
                 
             self.logger.info(f"Device found: {self.physical_path}")
+            
+            # Now initialize the NVMe wrapper with the correct device path
+            self.nvme = NvmeCommands(self.logger, device=self.physical_path)
+            
             return self.physical_path
             
         except Exception as e:
