@@ -3,7 +3,9 @@ import sys
 import os
 
 # Path to read the json from anywhere
-file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "json", "idcontrol.json"))
+file_path = os.path.join(os.path.dirname(os.path.abspath(os.path.join(__file__, ".."))),  # up to main.py's folder
+                         "utils", "json", "idcontrol.json"
+                         )
 
 from src.nvme_wrapper import NvmeCommands
 from src.logger import TestLogger
